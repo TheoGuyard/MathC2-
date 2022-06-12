@@ -27,11 +27,11 @@
 
 ## Quelques exemples
   * "Il existe un élément de $I$ égal à 1"
-    $$\exist \ i \in I, \ i = 1$$
+    $$\exists \ i \in I, \ i = 1$$
   * "Tous les éléments de $I$ sont égaux à 1"
     $$\forall \ i \in I, \ i = 1$$
   * "Tous les éléments de $I$ sauf un sont égaux à 1"
-    $$\exist \ i \in I, \ \forall j \in I, \ i \neq 1, \ j \neq i, \ j=1$$
+    $$\exists \ i \in I, \ \forall j \in I, \ i \neq 1, \ j \neq i, \ j=1$$
   * "Somme des éléments de $I$ égale à $1$"
     $$\sum_{i \in I} i = 1$$
   * "Somme des éléments de $P=\{p_1,\dots,p_n\}$ aves les indices dans $I$ égale à $1$"
