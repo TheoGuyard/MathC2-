@@ -1,37 +1,40 @@
 # MathC2+
 
-## Intro
+* But du sujet : Utiliser les sudokus pour faire une introduction aux quantificateurs logiques et à la programmation. L'objectif est de formaliser les règles du sudoku et de coder un vérificateur de grille et un solver si il y a assez de temps.
 
-* But du stage : familiariser avec la logique propositionnelle qui nous sert à formaliser les maths via les sudokus
+## I - Mise en contexte
 
-## Sudokus à la main
+### 1) Résolution de sudokus
 
-* 9x9 puis 4x4 pour généralisation à tout $n$ tel que $\sqrt{n}$ est entier
-* Essayer de mettre des mots sur les décisions prises
+* Faire résoudre des sudokus 9x9
+* Faire également résoudre des sudokus 4x4 pour montrer qu'on peut généraliser à tout sudoku de taille NxN
+* Faire expliquer les décision prises pour mettre des chiffres dans des cases
 
 
-## Écriture des règles en français
-* Règle 'ligne' : Pour toute ligne et pour toute valeur autorisée, on doit avoir une unique case de cette ligne prenant cette valeur
-* Règle 'colonne' : Pour toute colonne et pour toute valeur autorisée, on doit avoir une unique case de cette colonne prenant cette valeur
-* Règle 'bloc' : Pour tout bloc de la grille et pour toute valeur autorisée, on doit avoir une unique case de ce bloc prenant cette valeur
-* Règle 'remplissage' : Chaque case doit prendre une unique valeur (Contre exemple : Remplir la grille avec les 9 valeurs dans la diagonale avec multiples valeurs par case)
-* Règle 'grille initiale' : Pour toute case initialement fixée à une certaine valeur, on veut que la case correspondante reste fixée à la même valeur
+### 2) Écriture des règles de sudoku en français
+* Règle 'ligne' : Pour toute ligne et pour toute valeur autorisée, on doit avoir une unique case de cette ligne prenant cette valeur.
+* Règle 'colonne' : Pour toute colonne et pour toute valeur autorisée, on doit avoir une unique case de cette colonne prenant cette valeur.
+* Règle 'bloc' : Pour tout bloc de la grille et pour toute valeur autorisée, on doit avoir une unique case de ce bloc prenant cette valeur.
+* Règle 'remplissage' : Chaque case doit prendre une unique valeur.
+* Règle 'grille initiale' : Pour toute case initialement fixée à une certaine valeur, on veut que la case correspondante reste fixée à la même valeur.
 
-## Éléments de logique propositionnelle
-* Ensemble : un objet qui contient une collection de choses, on note $I=\{\mathrm{truc}_1,\mathrm{truc}_2,\dots\}$. On peut aussi avoir des couples $C=\{(a,b), (c,d)\}$...
+## II - Formalisation des règles
+
+### 1) Éléments de logique propositionnelle
+* Ensemble : un truc qui contient une collection de trucs, on note $I=\{\mathrm{truc}_1,\mathrm{truc}_2,\dots\}$. Les trucs peuvent aussi être des ensembles.
 * $\forall$ : "quelque soit"
 * $\exists$ : "il existe"
 * $\in$ : "dans"
-* $\sum_{i \in I} p_i$ : somme sur tous les $i$ dans l'ensemble $I$
-* $\implies$ : "implique
+* $\sum_{i \in I} ...$ : "somme sur tous les $i$ dans l'ensemble $I$"
+* $\implies$ : "implique"
 
-## Quelques exemples
+### 2) Quelques exemples
   * "Il existe un élément de $I$ égal à 1"
     $$\exists \ i \in I, \ i = 1$$
   * "Tous les éléments de $I$ sont égaux à 1"
     $$\forall \ i \in I, \ i = 1$$
   * "Tous les éléments de $I$ sauf un sont égaux à 1"
-    $$\exists \ i \in I, \ \forall j \in I, \ i \neq 1, \ j \neq i, \ j=1$$
+    $$\exists \ i \in I, \ i \neq 1, \ \forall j \in I, \ j \neq i, \ j=1$$
   * "Somme des éléments de $I$ égale à $1$"
     $$\sum_{i \in I} i = 1$$
   * "Somme des éléments de $P=\{p_1,\dots,p_n\}$ aves les indices dans $I$ égale à $1$"
@@ -41,11 +44,11 @@
   * "Pour chaque élément $J$ de $I$, il existe un élément de $J$ égal à $1$"
     $$\forall J \in I, \ \exists j \in J, \ j = 1$$
   * "Pour chaque élément $i$ de $I$ et pour chaque élément $j$ de $J$, $i > j$"
-    $$\forall i \in I, \ \forall j \in J, \ i > j$$
-  * "Pour chaque élément $i$ de $I$ et pour chaque élément $j$ de $J$, si $i=1$, alors $j=1$"
-    $$\forall i \in I, \ \forall j \in J, \ i=1 \implies j=1$$
+    $$\forall i \in I, \ \forall j \in J, \ i > j \quad \text{ou} \quad \min_{i \in I} i > \max_{j \in J} j$$
+  * "Pour chaque élément $p$ de $P$ (indicé par I) et pour chaque élément $q$ de $Q$ (indicé par I), si $p_i=1$, alors $q_i=1$"
+    $$\forall i \in I, \ p_i=1 \implies p_i=1$$
 
-## Notations utiles
+### 3) Notations utiles
 * $n$ : taille de la grille
 * $b = \sqrt{n}$ : taille d'un bloc 
 * $I = \{1,\dots,n\}$ : ensembles des indices de ligne
@@ -55,10 +58,10 @@
 * $B^*$ : l'ensemble des blocs de la grille
 * $X^0$ : la grille initiale
     
-## Écriture formelle des règles
+### 4) Écriture formelle des règles
 * Codage de l'information d'une case : $x_{ijk} = 
   \begin{cases}
-  1 \ \text{si} \ \mathrm{val}(i,j)=k \\
+  1 \ \text{si} \ \mathrm{valeur}(i,j)=k \\
   0 \ \text{sinon}
   \end{cases} \quad \forall \ i \in I, \ j \in J, \ k \in K$
 * Règle 'ligne' : $\forall \ i \in I, \ \forall k \in K, \sum_{j \in J} x_{ijk} = 1$
@@ -67,24 +70,12 @@
 * Règle 'remplissage' : $\forall \ i \in I, \ \forall \ j \in J$, $\sum_{k \in K} x_{ijk} = 1$
 * Règle 'grille initiale' : $\forall \ i \in I, \ \forall j \in J, \ \forall k \in K, \ X^0_{ijk} = 1 \implies X_{ijk} = 1$
 
-## Écriture d'un vérificateur de grille
+## III - Écriture d'un vérificateur et d'un solveur de grille
 
 * `verificateur.py`
+* `solveur.py`
 
-## Écriture d'un solver de grille
-
-* `solver.py`
-
-## Parallèle avec le jeu des 8 dames
+## IV - Parallèle avec le jeu des 8 dames
 
 * Placer 8 dames sur un échiquier 8x8 sans qu'elles ne se prennent
 * Même modèle mais notion de bloc différent et uniquement 2 chiffres possible par case (1 si dame est placée et 0 sinon)
-
-## Parallèle avec la coloration de graphe
-
-La résolution d'un sudoku peut être formalisée par le problème de la coloration de graphe. Le but, dans la version classique du jeu, est d'appliquer $n$ couleurs sur un graphe donné, à partir d'un coloriage partiel (la configuration initiale de la grille). Ce graphe possède $n^2$ sommets, un par cellule. Chacune des cases du sudoku peut être étiquetée avec un couple ordonné (x, y), où x et y sont des entiers compris entre 1 et $n$. Deux sommets distincts étiquetés par (x, y) et (x’, y’) sont reliés par une arête si et seulement si :
-  * x = x’ (les deux cellules appartiennent à la même ligne) ou,
-  * y = y’ (les deux cellules appartiennent à la même colonne) ou,
-  * $\text{ceil}(\frac{x}{\sqrt{n}})=\text{ceil}(\frac{x'}{\sqrt{n}})$ et $\text{ceil}(\frac{y}{\sqrt{n}})=\text{ceil}(\frac{y'}{\sqrt{n}})$, ie, les deux cellules appartiennent à la même région).
-
-La grille se complète en affectant un entier entre 1 et 9 pour chaque sommet, de façon que tous les sommets liés par une arête ne partagent pas le même entier.

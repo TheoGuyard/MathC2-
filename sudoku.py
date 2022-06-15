@@ -1,8 +1,6 @@
-import numpy as np
 from math import sqrt
-from pyomo.environ import *
-
-CPLEX_PATH = "/Applications/CPLEX_Studio201/cplex/bin/x86-64_osx/cplex"
+from random import shuffle, randint
+from verificateur import verificateur
 
 class Sudoku:
     
@@ -10,28 +8,26 @@ class Sudoku:
         assert sqrt(n) == int(sqrt(n)), "n n'est pas un carré !"
         self.n = n
         self.b = int(sqrt(self.n))
-        self.X = np.zeros((self.n, self.n, self.n), dtype=int)
+        self.X = [[[0 for k in range(n)] for j in range(n)] for i in range(n)]
         self.initialize_diagonal()
         while True:
-            valid = self.solve()
-            if not valid:
+            self.solve()
+            if not self.grid_is_valid():
                 self.empty_grid()
                 self.initialize_diagonal()
             else:
                 break
 
     def empty_grid(self):
-        self.X = np.zeros((self.n, self.n, self.n), dtype=int)
+        self.X = [[[0 for k in range(self.n)] for j in range(self.n)] for i in range(self.n)]
 
     def initialize_diagonal(self):
-        B = []          # Ensemble des blocs de la grille
+        B = []
         for bb in range(0, self.n, self.b):
-            numbers = np.arange(self.n)
-            np.random.shuffle(numbers)
-            numbers = numbers.reshape(self.b, self.b)
-            for i in range(self.b):
-                for j in range(self.b):
-                    self.X[bb + i, bb + j, numbers[i, j]] = 1
+            numbers = [i for i in range(self.n)]
+            shuffle(numbers)
+            for i, number in enumerate(numbers):
+                self.X[bb + i // self.b][bb + i % self.b][number] = 1
 
     def print_grid(self):
         print(self)
@@ -41,71 +37,76 @@ class Sudoku:
         masked = []
         for mi in range(m):
             while True:
-                i = np.random.randint(0, self.n)
-                j = np.random.randint(0, self.n)
+                i = randint(0, self.n - 1)
+                j = randint(0, self.n - 1)
                 if not (i, j) in masked:
-                    self.X[i, j, :] = 0
+                    self.X[i][j] = [0 for _ in range(self.n)]
                     masked.append((i, j))
                     break
 
-    def solve(self):
-        n = self.n
-        b = int(sqrt(n))
-        N = list(range(1, n+1))
+    def find_empty_position(self):
+        for i in range(self.n):
+            for j in range(self.n):
+                if not any(self.X[i][j]):
+                    return (i, j)
+        return None
 
-        model = ConcreteModel()
-        model.x = Var(N, N, N, within = Binary)
+    def is_fillable_with(self, i, j, k):
+        for c in range(self.n):
+            if self.X[i][c][k] == 1 and j != c:
+                return False
+        for l in range(len(self.X[0])):
+            if self.X[l][j][k] == 1 and i != l:
+                return False
+        cube_x = j // self.b
+        cube_y = i // self.b
+        for l in range(cube_y * self.b, cube_y * self.b + self.b):
+            for c in range(cube_x * self.b, cube_x * self.b + self.b):
+                if self.X[l][c][k] == 1 and (l,c) != (i, j):
+                    return False
+        return True
 
-        # Assignment constraint
-        model.allcell_constr = ConstraintList()
-        for i in N:
-            for j in N:
-                model.allcell_constr.add(1 == sum(model.x[i, j, k] for k in N))
+    def grid_is_valid(self):
+        for i in range(self.n):
+            for j in range(self.n):
+                if sum(self.X[i][j]) != 1:
+                    return False
+        for i in range(self.n):
+            for k in range(self.n):
+                if sum(self.X[i][j][k] for j in range(self.n)) != 1:
+                    return False
+        for j in range(self.n):
+            for k in range(self.n):
+                if sum(self.X[i][j][k] for i in range(self.n)) != 1:
+                    return False
+        for i in range(self.n):
+            for j in range(self.n):
+                if i % self.b == j % self.b == 0: 
+                    for k in range(self.n):  
+                        if sum(self.X[ib][jb][k] for ib in range(i, i + self.b) for jb in range(j, j + self.b)) != 1:
+                            return False
+        return True
 
-        # Row constraint
-        model.row_constr = ConstraintList()
-        for i in N:
-            for k in N:
-                model.row_constr.add(1 == sum(model.x[i, j, k] for j in N))
-            
-        # Column constraint
-        model.col_constr = ConstraintList()
-        for j in N:
-            for k in N:
-                model.col_constr.add(1 == sum(model.x[i, j, k] for i in N))
-            
-        # Block constraint
-        model.blk_constr = ConstraintList()
-        for i in list(range(1, n, b)):
-            i_blk = range(i, i+b)
-            for j in list(range(1, n, b)):
-                j_blk = range(j, j+b)
-                for k in N:
-                    model.blk_constr.add(1 == sum(model.x[p, q, k] for p in i_blk for q in j_blk))
-            
-        # Initial constraint
-        model.initcell_constr = ConstraintList()
-        for i in N:
-            for j in N:
-                if np.sum(self.X[i-1, j-1, :]) == 1:
-                    k = np.where(self.X[i-1, j-1, :])[0][0] + 1
-                    model.initcell_constr.add(1 == model.x[i,j,k])
-            
-        # Objective function
-        model.Obj = Objective(expr = summation(model.x), sense=minimize)
+    def solve(self, verbosity=False):
 
-        # Solving 
-        opt = SolverFactory('cplex', executable=CPLEX_PATH)
-        res = opt.solve(model)
+        if verbosity:
+            print("RESOLUTION ...")
+            print(self)
+            print()
 
-        # Recover the grid
-        for i in N:
-            for j in N:
-                for k in N:
-                    if model.x[i,j,k]() == 1:
-                        self.X[i-1, j-1, k-1] = 1
+        empty_position = self.find_empty_position()
+        if not empty_position:
+            return True
+        else:
+            i, j = empty_position
 
-        return res.solver.termination_condition == TerminationCondition.optimal
+        for k in range(self.n):
+            if self.is_fillable_with(i, j, k):
+                self.X[i][j][k] = 1
+                if self.solve(verbosity=verbosity):
+                    return True
+                self.X[i][j][k] = 0
+        return False
 
     def __str__(self):
         colspace = len(str(self.n)) + 1
@@ -114,13 +115,13 @@ class Sudoku:
         for i in range(self.n):
             result += "| "
             for j in range(self.n):
-                vals = np.where(self.X[i, j, :] == 1)[0]
-                if vals.size == 0:
+                vals = [k for k in range(self.n) if self.X[i][j][k] == 1]
+                if len(vals) == 0:
                     k = " " * colspace
-                elif vals.size == 1:
+                elif len(vals) == 1:
                     k = " " * (colspace - len(str(vals[0] + 1)) - 1) + str(vals[0] + 1) + " "
                 else:
-                    k = " " * (colspace - 1) + "?"
+                    k = "?" + " " * (colspace - 1)
                 result += k
                 if j in range(self.b-1,self.n-1,self.b):
                     result += "| "
