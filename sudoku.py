@@ -1,6 +1,6 @@
+from copy import deepcopy
 from math import sqrt
 from random import shuffle, randint
-from verificateur import verificateur
 
 class Sudoku:
     
@@ -17,6 +17,7 @@ class Sudoku:
                 self.initialize_diagonal()
             else:
                 break
+        self.X0 = deepcopy(self.X)
 
     def empty_grid(self):
         self.X = [[[0 for k in range(self.n)] for j in range(self.n)] for i in range(self.n)]
@@ -43,6 +44,7 @@ class Sudoku:
                     self.X[i][j] = [0 for _ in range(self.n)]
                     masked.append((i, j))
                     break
+        self.X0 = deepcopy(self.X)
 
     def find_empty_position(self):
         for i in range(self.n):
