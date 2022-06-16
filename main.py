@@ -17,5 +17,4 @@ print("SUDOKU RÉSOLU")
 sudoku.solve()
 print(sudoku)
 
-# A vous de coder !
 verificateur(sudoku)
