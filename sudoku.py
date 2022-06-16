@@ -4,7 +4,7 @@ from random import shuffle, randint
 
 class Sudoku:
     
-    def __init__(self, n):
+    def __init__(self, n: int):
         assert sqrt(n) == int(sqrt(n)), "n n'est pas un carré !"
         self.n = n
         self.b = int(sqrt(self.n))
@@ -33,7 +33,7 @@ class Sudoku:
     def print_grid(self):
         print(self)
 
-    def mask(self, p=0.5):
+    def mask(self, p: float = 0.5):
         m = round(p * self.n**2)
         masked = []
         for mi in range(m):
@@ -53,7 +53,7 @@ class Sudoku:
                     return (i, j)
         return None
 
-    def is_fillable_with(self, i, j, k):
+    def is_fillable_with(self, i: int, j: int, k: int) -> bool:
         for c in range(self.n):
             if self.X[i][c][k] == 1 and j != c:
                 return False
@@ -68,7 +68,7 @@ class Sudoku:
                     return False
         return True
 
-    def grid_is_valid(self):
+    def grid_is_valid(self) -> bool:
         for i in range(self.n):
             for j in range(self.n):
                 if sum(self.X[i][j]) != 1:
@@ -89,7 +89,7 @@ class Sudoku:
                             return False
         return True
 
-    def solve(self, verbosity=False):
+    def solve(self, verbosity: bool = False):
 
         if verbosity:
             print("RESOLUTION ...")
