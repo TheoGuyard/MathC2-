@@ -70,7 +70,6 @@
 * Règle 'remplissage' : $\forall \ i \in I, \ \forall \ j \in J$, $\sum_{k \in K} x_{ijk} = 1$
 * Règle 'grille initiale' : $\forall \ i \in I, \ \forall j \in J, \ \forall k \in K, \ X^0_{ijk} = 1 \implies X_{ijk} = 1$
 
-## III - Écriture d'un vérificateur et d'un solveur de grille
+## III - Écriture d'un vérificateur de grille
 
 * `verificateur.py`
-* `solveur.py`
