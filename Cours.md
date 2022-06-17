@@ -59,15 +59,11 @@
 * $X^0$ : la grille initiale
     
 ### 4) Écriture formelle des règles
-* Codage de l'information d'une case : $x_{ijk} = 
-  \begin{cases}
-  1 \ \text{si} \ \mathrm{valeur}(i,j)=k \\
-  0 \ \text{sinon}
-  \end{cases} \quad \forall \ i \in I, \ j \in J, \ k \in K$
+* Codage de l'information d'une case : $x_{ijk} = 1 \ \text{si} \ \mathrm{valeur}(i,j)=k \ \text{et} \ 0 \ \text{sinon}, \quad \forall \ i \in I, \ j \in J, \ k \in K$
 * Règle 'ligne' : $\forall \ i \in I, \ \forall k \in K, \sum_{j \in J} x_{ijk} = 1$
 * Règle 'colonne' : $\forall \ j \in J, \ \forall k \in K, \sum_{i \in I} x_{ijk} = 1$
 * Règle 'bloc' : $\forall \ B \in B^{\star}, \ \forall k \in K, \ \sum_{(i,j) \in B} x_{ijk} = 1$
-* Règle 'remplissage' : $\forall \ i \in I, \ \forall \ j \in J$, $\sum_{k \in K} x_{ijk} = 1$
+* Règle 'remplissage' : $\forall \ i \in I, \ \forall \ j \in J, \sum_{k \in K} x_{ijk} = 1$
 * Règle 'grille initiale' : $\forall \ i \in I, \ \forall j \in J, \ \forall k \in K, \ X^0_{ijk} = 1 \implies X_{ijk} = 1$
 
 ## III - Écriture d'un vérificateur de grille
